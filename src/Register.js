@@ -1,48 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-
-const required = (value) => {
-  if (!value) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        This field is required!
-      </div>
-    );
-  }
-};
-
-const vusername = (value) => {
-  if (value.length < 3 || value.length > 20) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        The username must be between 3 and 20 characters.
-      </div>
-    );
-  }
-};
-
-const vpassword = (value) => {
-  if (value.length < 6 || value.length > 40) {
-    return (
-      <div className="alert alert-danger" role="alert">
-        The password must be between 6 and 40 characters.
-      </div>
-    );
-  }
-};
+import Alert from "react-bootstrap/Alert";
 
 const Register = () => {
-  const form = useRef();
-
   const [username, setUsername] = useState("");
   const [first_name, setFirstName] = useState("");
   const [last_name, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [is_manager, setIsManager] = useState("");
-  const [successful, setSuccessful] = useState(false);
   const [location, setLocation] = useState(false);
+  const [error, setError] = useState(false);
+  const [validated, setValidated] = useState(false);
+  const [message, setMessage] = useState("");
 
   const onChangeUsername = (e) => {
     const username = e.target.value;
@@ -74,7 +45,10 @@ const Register = () => {
     setIsManager(isManager);
   };
 
-  const onChangeLocation = (e) => {};
+  const onChangeLocation = (e) => {
+    const allowLocation = e.target.checked;
+    setLocation(allowLocation);
+  };
 
   const callback = (position) => {
     console.log(position);
@@ -87,12 +61,22 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (navigator.geolocation) {
-      console.log("Here");
-      navigator.geolocation.getCurrentPosition(callback, onError);
+    const form = e.currentTarget;
+    if (form.checkValidity() === false) {
+      e.stopPropagation();
     } else {
-      console.log("Not supported operation");
+      if (location) {
+        if (navigator.geolocation) {
+          console.log("Here");
+          navigator.geolocation.getCurrentPosition(callback, onError);
+        } else {
+          console.log("Not supported operation");
+        }
+      } else {
+        onError();
+      }
     }
+    setValidated(true);
   };
 
   const callAPI = (long, lat) => {
@@ -108,8 +92,6 @@ const Register = () => {
       lat,
     };
 
-    console.log(user);
-
     fetch(`http://localhost:8080/user/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -118,61 +100,95 @@ const Register = () => {
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
+        if (res.success) {
+          setError(false);
+          resetForm();
+        } else {
+          setError(true);
+        }
+        setMessage(res.message);
       });
   };
 
+  const resetForm = () => {
+    setUsername("");
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setLocation(false);
+    setIsManager(false);
+    setPassword("");
+  };
+
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form noValidate validated={validated} onSubmit={handleSubmit}>
       <Form.Group controlId="formBasicEmail">
         <Form.Label>Enter username</Form.Label>
         <Form.Control
+          required
           type="text"
           placeholder="Enter username"
           value={username}
           onChange={onChangeUsername}
         />
+        <Form.Control.Feedback type="invalid">
+          This field is required
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group controlId="firstName">
         <Form.Label>Enter first name</Form.Label>
         <Form.Control
+          required
           type="text"
           placeholder="Enter first name"
           value={first_name}
           onChange={onChangeFirstName}
         />
+        <Form.Control.Feedback type="invalid">
+          This field is required
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group controlId="lastName">
         <Form.Label>Enter last name</Form.Label>
         <Form.Control
+          required
           type="text"
           placeholder="Enter last name"
           value={last_name}
           onChange={onChangeLastName}
         />
+        <Form.Control.Feedback type="invalid">
+          This field is required
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group controlId="formBasicPassword">
         <Form.Label>Password</Form.Label>
         <Form.Control
+          required
           type="password"
           placeholder="Password"
           value={password}
           onChange={onChangePassword}
         />
+        <Form.Control.Feedback type="invalid">
+          This field is required
+        </Form.Control.Feedback>
       </Form.Group>
       <Form.Group controlId="email">
         <Form.Label>Email</Form.Label>
         <Form.Control
+          required
           type="email"
           placeholder="Email"
           value={email}
           onChange={onChangeEmail}
         />
-        <Form.Text className="text-muted">
-          We'll never share your email with anyone else.
-        </Form.Text>
+        <Form.Control.Feedback type="invalid">
+          This field is required
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group controlId="formBasicCheckbox">
@@ -191,7 +207,7 @@ const Register = () => {
           onChange={onChangeLocation}
         />
         <Form.Text className="text-muted">
-          Withou your location we will not be able to include you in
+          Without your location we will not be able to include you in
           discoveries.
         </Form.Text>
       </Form.Group>
@@ -199,6 +215,13 @@ const Register = () => {
       <Button variant="primary" type="submit">
         Submit
       </Button>
+      <Alert
+        variant={error ? "danger" : "success"}
+        style={{ marginTop: "10px" }}
+        hidden={!message.length}
+      >
+        {message}
+      </Alert>
     </Form>
   );
 };

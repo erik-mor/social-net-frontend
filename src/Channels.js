@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { UserContext } from "./UserContext";
+import Card from "react-bootstrap/Card";
 
 const Channels = () => {
   const [channels, setChannels] = useState([]);
@@ -16,11 +17,26 @@ const Channels = () => {
             return res.json();
           }
         })
-        .then((res) => console.log(res));
+        .then((res) => setChannels(res));
     }
   }, [userName, channels]);
 
-  return <h1>Messages</h1>;
+  return (
+    <React.Fragment>
+      {channels &&
+        channels.map((channel) => (
+          <Card key={channel.channel_id} style={{ width: "18rem" }}>
+            <Card.Body>
+              <Card.Title>
+                <a href={`channels/${channel.channel_id}`}>
+                  {channel.firstName} {channel.lastName}
+                </a>
+              </Card.Title>
+            </Card.Body>
+          </Card>
+        ))}
+    </React.Fragment>
+  );
 };
 
 export default Channels;

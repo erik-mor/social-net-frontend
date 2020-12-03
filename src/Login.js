@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
 import { Redirect } from "react-router-dom";
 import { UserContext } from "./UserContext";
 
@@ -10,6 +11,8 @@ const Login = () => {
   const [id, setId] = useState();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useContext(UserContext);
+  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const onChangeUsername = (e) => {
     const username = e.target.value;
@@ -38,6 +41,7 @@ const Login = () => {
       .then((res) => {
         console.log(res);
         if (res.success) {
+          setError(false);
           setId(res.id);
           let userToSave = {
             id: res.id,
@@ -46,6 +50,9 @@ const Login = () => {
           };
           setUserName(userToSave);
           setIsLoggedIn(true);
+        } else {
+          setError(true);
+          setErrorMessage(res.message);
         }
       });
   };
@@ -77,6 +84,9 @@ const Login = () => {
         <Button variant="primary" type="submit">
           Submit
         </Button>
+        <Alert variant="danger" hidden={!error} style={{ marginTop: "10px" }}>
+          {errorMessage}
+        </Alert>
       </Form>
     );
   }
