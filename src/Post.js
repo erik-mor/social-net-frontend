@@ -15,7 +15,6 @@ const Post = (props) => {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         setFirstName(res.firstName);
         setLastName(res.lastName);
       });

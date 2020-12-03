@@ -1,21 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Post from "./Post";
+import { UserContext } from "./UserContext";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
+  const [userName, setUserName] = useContext(UserContext);
 
   useEffect(() => {
-    fetch("http://localhost:8080/post/", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((res) => {
-        if (res.status == 200) {
-          return res.json();
-        }
+    if (userName) {
+      fetch(`http://localhost:8080/post/home/${userName.id}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
       })
-      .then((res) => setPosts(res));
-  }, []);
+        .then((res) => {
+          return res.json();
+        })
+        .then((res) => {
+          setPosts(res);
+        });
+    }
+  }, [userName]);
 
   if (posts && posts.length) {
     return posts.map((post) => (

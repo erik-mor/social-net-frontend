@@ -18,15 +18,7 @@ function App() {
           <Navigation />
           <div className="container">
             <Switch>
-              <Route
-                path={["/", "/home"]}
-                exact
-                render={(props) => (
-                  <React.Fragment>
-                    <Posts />
-                  </React.Fragment>
-                )}
-              />
+              <Route path={["/", "/home"]} exact component={Posts} />
               <Route exact path="/login" component={Login} />
               <Route exact path="/register" component={Register} />
 
