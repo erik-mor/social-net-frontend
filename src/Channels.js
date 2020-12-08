@@ -17,14 +17,17 @@ const Channels = () => {
             return res.json();
           }
         })
-        .then((res) => setChannels(res));
+        .then((res) => {
+          setChannels(res);
+          console.log(res);
+        });
     }
-  }, [userName, channels]);
+  }, [userName]);
 
-  return (
-    <React.Fragment>
-      {channels &&
-        channels.map((channel) => (
+  if (channels && channels.length) {
+    return (
+      <React.Fragment>
+        {channels.map((channel) => (
           <Card key={channel.channel_id} style={{ width: "18rem" }}>
             <Card.Body>
               <Card.Title>
@@ -35,8 +38,15 @@ const Channels = () => {
             </Card.Body>
           </Card>
         ))}
-    </React.Fragment>
-  );
+      </React.Fragment>
+    );
+  } else {
+    return (
+      <React.Fragment>
+        <h2>No open channels</h2>
+      </React.Fragment>
+    );
+  }
 };
 
 export default Channels;
