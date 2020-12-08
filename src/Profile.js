@@ -87,6 +87,8 @@ const Profile = ({ match }) => {
                 {user.firstName} {user.lastName}
               </Card.Title>
               <Card.Text>{user.is_manager ? "Manager" : "Player"}</Card.Text>
+              <Card.Text>{user.club}</Card.Text>
+              {!user.is_manager && <Card.Text>{user.position}</Card.Text>}
               <Button
                 className="primary"
                 hidden={isMe}

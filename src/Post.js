@@ -23,7 +23,7 @@ const Post = (props) => {
   return (
     <div>
       {userName ? (
-        <Card style={{ width: "18rem" }}>
+        <Card style={{ width: "70rem", margin: "10px" }}>
           <Card.Body>
             <Card.Title>
               <a href={`profile/${props.user_id}`}>

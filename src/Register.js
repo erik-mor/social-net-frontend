@@ -7,6 +7,8 @@ const Register = () => {
   const [username, setUsername] = useState("");
   const [first_name, setFirstName] = useState("");
   const [last_name, setLastName] = useState("");
+  const [club, setClub] = useState("");
+  const [position, setPosition] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [is_manager, setIsManager] = useState("");
@@ -14,6 +16,23 @@ const Register = () => {
   const [error, setError] = useState(false);
   const [validated, setValidated] = useState(false);
   const [message, setMessage] = useState("");
+  const [positions, setPositions] = useState(["CM", "ST", "GK"]);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/user/positions/", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => {
+        if (res.status == 200) {
+          return res.json();
+        }
+      })
+      .then((res) => {
+        setPositions(res);
+        setPosition(positions[0]);
+      });
+  }, []);
 
   const onChangeUsername = (e) => {
     const username = e.target.value;
@@ -34,6 +53,9 @@ const Register = () => {
     const email = e.target.value;
     setEmail(email);
   };
+  const onChangeClub = (e) => {
+    setClub(e.target.value);
+  };
 
   const onChangePassword = (e) => {
     const password = e.target.value;
@@ -48,6 +70,11 @@ const Register = () => {
   const onChangeLocation = (e) => {
     const allowLocation = e.target.checked;
     setLocation(allowLocation);
+  };
+
+  const onChangePosition = (e) => {
+    setPosition(e.target.value);
+    console.log(e.target.value);
   };
 
   const callback = (position) => {
@@ -81,10 +108,13 @@ const Register = () => {
 
   const callAPI = (long, lat) => {
     console.log(long, lat);
+    let pos = is_manager ? null : position;
     let user = {
       username,
       first_name,
       last_name,
+      club,
+      position: pos,
       email,
       password,
       is_manager,
@@ -118,6 +148,8 @@ const Register = () => {
     setLocation(false);
     setIsManager(false);
     setPassword("");
+    setClub("");
+    setPosition(positions[0]);
   };
 
   return (
@@ -191,14 +223,44 @@ const Register = () => {
         </Form.Control.Feedback>
       </Form.Group>
 
+      <Form.Group controlId="club">
+        <Form.Label>Enter your club</Form.Label>
+        <Form.Control
+          required
+          type="text"
+          placeholder="club"
+          value={club}
+          onChange={onChangeClub}
+        />
+        <Form.Control.Feedback type="invalid">
+          This field is required
+        </Form.Control.Feedback>
+      </Form.Group>
+
       <Form.Group controlId="formBasicCheckbox">
         <Form.Check
           type="checkbox"
-          label="Are you a manager"
+          label="Are you a manager ?"
           checked={is_manager}
           onChange={onChangeIsManager}
         />
       </Form.Group>
+
+      {!is_manager && (
+        <Form.Group controlId="position">
+          <Form.Label>Select your position</Form.Label>
+          <Form.Control
+            as="select"
+            value={position}
+            onChange={onChangePosition}
+          >
+            {positions.map((pos) => (
+              <option>{pos}</option>
+            ))}
+          </Form.Control>
+        </Form.Group>
+      )}
+
       <Form.Group controlId="location">
         <Form.Check
           type="checkbox"

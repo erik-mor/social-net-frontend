@@ -32,6 +32,8 @@ const Discover = () => {
                   {user.firstName} {user.lastName}
                 </a>
               </Card.Title>
+              <Card.Text>{user.club}</Card.Text>
+              <Card.Text>{user.position}</Card.Text>
             </Card.Body>
           </Card>
         ))}
