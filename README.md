@@ -1,2 +1,2 @@
 # social-net-frontend
-ReactJS frontend for social net application
+Frontend application for social network project implemented in React.js for course VIS.
